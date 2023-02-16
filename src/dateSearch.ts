@@ -8,7 +8,7 @@ import isEmpty from "lodash.isempty";
 export type Comparator<T> = (a: T, b: T) => number;
 
 /**
- * Search result format
+ * Search result format returned by the search.
  */
 export type DateSearchResult<T> = {
   index: number | null;
@@ -16,12 +16,14 @@ export type DateSearchResult<T> = {
 };
 
 /**
- * JS primitives that can describe a date
+ * JS primitives that can describe a date. DayJS is used to parse them to Date objects.
+ *
+ * Only "string", "number", "Date" objects are valid.
  */
 export const DATE_TYPES = ["string", "number", "Date"];
 
 /**
- * Determines if dayJS can parse the input value
+ * Determines if dayJS can parse the input value.
  * @param x any input type
  * @returns boolean
  */
@@ -38,7 +40,7 @@ export const isDateType = <T>(x: T) => {
  * Fallback, try to make a numeric representation of a non-standard input
  * Arrays, Strings or objects use length.
  *
- * Worst case, this allows for graceful failure if invalid data is provided.
+ * Worst case, this allows for graceful failure and allows the algo to continue if invalid data is provided.
  *
  * @param x
  * @returns number
@@ -59,7 +61,8 @@ export const parseToValidNumber = <T>(x: T) => {
 };
 
 /**
- * Compares two times/dates and determine which direction to search
+ * Compares two times/dates and determine which direction to search.
+ *
  * @param a Date
  * @param b Date
  * @returns number
@@ -75,7 +78,8 @@ export function defaultTimeComparator<T>(a: T, b: T) {
 }
 
 /**
- * Compare nested data that contains a date/time stamp
+ * Compare nested data that contains a date/time stamp.
+ *
  * @param target searched for value
  * @param search compared value
  * @param stringPath deep pointer to key in nested objects
@@ -95,9 +99,9 @@ export function deepTimeComparator<T>(
 
 /**
  * Modify return value when search is complete.
- * EXACT: null if not found
- * CLOSEST_FLOOR: closest value in array rounding down or first item
- * CLOSEST_CEIL: closest value in array rounding up or last item
+ * - EXACT: null if not found
+ * - CLOSEST_FLOOR: closest value in array rounding down or first item
+ * - CLOSEST_CEIL: closest value in array rounding up or last item
  */
 export enum DateSearchModes {
   EXACT,
@@ -105,6 +109,15 @@ export enum DateSearchModes {
   CLOSEST_CEIL,
 }
 
+/**
+ * Binary Search for dates or time series data.
+ *
+ * @param array Sorted array containing date/time values
+ * @param target date/time value
+ * @param comparator string pointing to a nested key or comparator function
+ * @param dateSearchMode Exact or fuzzy search
+ * @returns
+ */
 export function dateSearch<T>(
   array: T[],
   target: T,
