@@ -5,11 +5,16 @@
   "description": "Universal time series search",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FrankFlitton/date-search.git"
+  },
+  "homepage": "https://github.com/FrankFlitton/date-search#readme",
   "contributors": [
     {
       "name": "Frank Flitton",
       "email": "fflitton@gmail.com",
-      "url": "https://github.com/frankflitton"
+      "url": "https://frankflitton.com"
     }
   ],
   "keywords": [

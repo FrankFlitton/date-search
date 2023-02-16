@@ -36,6 +36,10 @@ index; // 0
 - Fuzzy search: find the exact or closest item.
 - Written in typescript with type documentation.
 
+## Documentation
+
+For detailed documentation: [https://date-search.netlify.app](https://date-search.netlify.app)
+
 ## Advanced Usage
 
 The search algo accepts these parameters:
