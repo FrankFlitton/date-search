@@ -1,7 +1,7 @@
 {
   "name": "date-search",
   "private": false,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Universal time series search",
   "type": "module",
   "license": "MIT",
