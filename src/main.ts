@@ -1,4 +1,3 @@
-import { setupCounter } from "./counter";
 import {
   dateSearch,
   deepTimeComparator,
@@ -11,11 +10,12 @@ import {
   DATE_SEARCH_MODES,
 } from "./dateSearch";
 
-document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
-  <div class="card">
-    <button id="counter" type="button"></button>
-  </div>
-`;
+// document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
+//   <div class="card">
+//   <button id="counter" type="button"></button>
+//   </div>
+//   `;
+// setupCounter(document.querySelector<HTMLButtonElement>("#counter")!);
 
 export {
   dateSearch,
@@ -28,5 +28,3 @@ export {
 };
 
 export type { Comparator, DateSearchResult };
-
-setupCounter(document.querySelector<HTMLButtonElement>("#counter")!);
