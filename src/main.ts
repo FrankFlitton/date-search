@@ -7,7 +7,7 @@ import {
   DATE_TYPES,
   Comparator,
   DateSearchResult,
-  DATE_SEARCH_MODES,
+  DateSearchModes,
 } from "./dateSearch";
 
 // document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
@@ -24,7 +24,7 @@ export {
   parseToValidNumber,
   isDateType,
   DATE_TYPES,
-  DATE_SEARCH_MODES,
+  DateSearchModes,
 };
 
 export type { Comparator, DateSearchResult };

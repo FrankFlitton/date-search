@@ -3,16 +3,28 @@ import get from "lodash.get";
 import isEmpty from "lodash.isempty";
 
 /**
- * Compares the two values as a number
+ * Compares the two values numerically
  */
 export type Comparator<T> = (a: T, b: T) => number;
 
+/**
+ * Search result format
+ */
 export type DateSearchResult<T> = {
   index: number | null;
   value: T | null;
 };
 
+/**
+ * JS primitives that can describe a date
+ */
 export const DATE_TYPES = ["string", "number", "Date"];
+
+/**
+ * Determines if dayJS can parse the input value
+ * @param x any input type
+ * @returns boolean
+ */
 export const isDateType = <T>(x: T) => {
   const xType = typeof x;
   if (DATE_TYPES.indexOf(xType)) {
@@ -22,8 +34,17 @@ export const isDateType = <T>(x: T) => {
   }
 };
 
+/**
+ * Fallback, try to make a numeric representation of a non-standard input
+ * Arrays, Strings or objects use length.
+ *
+ * Worst case, this allows for graceful failure if invalid data is provided.
+ *
+ * @param x
+ * @returns number
+ */
 export const parseToValidNumber = <T>(x: T) => {
-  const isArrayOrObject = isEmpty(x);
+  const isArrayOrObject = typeof x === "object" && isEmpty(x);
   let l = -1;
   if (isArrayOrObject) {
     l = Array.isArray(x) ? x.length : Object.keys(x as Object).length;
@@ -37,6 +58,12 @@ export const parseToValidNumber = <T>(x: T) => {
   return validN;
 };
 
+/**
+ * Compares two times/dates and determine which direction to search
+ * @param a Date
+ * @param b Date
+ * @returns number
+ */
 export function defaultTimeComparator<T>(a: T, b: T) {
   if (isDateType(a) && isDateType(b)) {
     return (
@@ -47,6 +74,14 @@ export function defaultTimeComparator<T>(a: T, b: T) {
   return parseToValidNumber(a) - parseToValidNumber(b);
 }
 
+/**
+ * Compare nested data that contains a date/time stamp
+ * @param target searched for value
+ * @param search compared value
+ * @param stringPath deep pointer to key in nested objects
+ * @param comparator comparison fn
+ * @returns number
+ */
 export function deepTimeComparator<T>(
   target: T,
   search: T,
@@ -58,20 +93,26 @@ export function deepTimeComparator<T>(
   return comparator(targetVal, searchVal);
 }
 
-export const DATE_SEARCH_MODES = {
-  EXACT: "exact",
-  CLOSEST_FLOOR: "floor",
-  CLOSEST_CEIL: "ceil",
-};
+/**
+ * Modify return value when search is complete.
+ * EXACT: null if not found
+ * CLOSEST_FLOOR: closest value in array rounding down or first item
+ * CLOSEST_CEIL: closest value in array rounding up or last item
+ */
+export enum DateSearchModes {
+  EXACT,
+  CLOSEST_FLOOR,
+  CLOSEST_CEIL,
+}
 
 export function dateSearch<T>(
   array: T[],
   target: T,
   comparator: Comparator<T> | null | string = defaultTimeComparator,
-  dateSearchMode = DATE_SEARCH_MODES.EXACT
+  dateSearchMode: DateSearchModes = DateSearchModes.EXACT
 ): DateSearchResult<T> {
   const comparisonFn = (mid: number) => {
-    console.log(mid)
+    console.log(mid);
     if (typeof comparator === "string") {
       const keyPointer = comparator;
       return deepTimeComparator(
@@ -103,21 +144,23 @@ export function dateSearch<T>(
     }
   }
 
+  const fallbackIndex = Math.floor((right + left) / 2);
+
   switch (dateSearchMode) {
-    case DATE_SEARCH_MODES.EXACT:
+    case DateSearchModes.EXACT:
       return {
         index: null,
         value: null,
       };
-    case DATE_SEARCH_MODES.CLOSEST_FLOOR:
+    case DateSearchModes.CLOSEST_FLOOR:
+      const floor = Math.max(0, fallbackIndex);
       return {
-        index: left,
-        value: array[left],
+        index: floor,
+        value: array[floor],
       };
-    case DATE_SEARCH_MODES.CLOSEST_CEIL:
-      const next = left + 1;
-      const last = array.length - 1;
-      const ceil = next <= array.length - 1 ? next : last;
+    case DateSearchModes.CLOSEST_CEIL:
+      const next = fallbackIndex + 1;
+      const ceil = Math.min(next, array.length - 1);
       return {
         index: ceil,
         value: array[ceil],
