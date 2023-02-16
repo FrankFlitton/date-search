@@ -1,8 +1,27 @@
 {
   "name": "date-search",
-  "private": true,
-  "version": "0.0.0",
+  "private": false,
+  "version": "1.0.0",
+  "description": "Universal time series search",
   "type": "module",
+  "license": "MIT",
+  "contributors": [
+    {
+      "name": "Frank Flitton",
+      "email": "fflitton@gmail.com",
+      "url": "https://github.com/frankflitton"
+    }
+  ],
+  "keywords": [
+    "binary search",
+    "DayJS",
+    "Date",
+    "time series",
+    "node",
+    "module",
+    "library",
+    "typescript"
+  ],
   "exports": {
     ".": {
       "import": "./dist/main.es.js",
