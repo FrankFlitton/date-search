@@ -1,6 +1,5 @@
 # date-search
-
-> universal date or time series data search
+> Universal time series search
 
 Search through your time series data with javascript. Find a value or its closest match through a list of dates or data frames. Dates can be represented as date string or number format that dateJS can parse.
 
