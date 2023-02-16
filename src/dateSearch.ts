@@ -5,7 +5,12 @@ import isEmpty from "lodash.isempty";
 /**
  * Compares the two values as a number
  */
-type Comparator<T> = (a: T, b: T) => number;
+export type Comparator<T> = (a: T, b: T) => number;
+
+export type DateSearchResult<T> = {
+  index: number | null;
+  value: T | null;
+};
 
 export const DATE_TYPES = ["string", "number", "Date"];
 export const isDateType = <T>(x: T) => {
@@ -35,11 +40,11 @@ export const parseToValidNumber = <T>(x: T) => {
 export function defaultTimeComparator<T>(a: T, b: T) {
   if (isDateType(a) && isDateType(b)) {
     return (
-      dayjs.default(b as dayjs.Dayjs).unix() -
-      dayjs.default(a as dayjs.Dayjs).unix()
+      dayjs.default(a as dayjs.Dayjs).unix() -
+      dayjs.default(b as dayjs.Dayjs).unix()
     );
   }
-  return parseToValidNumber(b) - parseToValidNumber(a);
+  return parseToValidNumber(a) - parseToValidNumber(b);
 }
 
 export function deepTimeComparator<T>(
@@ -53,27 +58,44 @@ export function deepTimeComparator<T>(
   return comparator(targetVal, searchVal);
 }
 
+export const DATE_SEARCH_MODES = {
+  EXACT: "exact",
+  CLOSEST_FLOOR: "floor",
+  CLOSEST_CEIL: "ceil",
+};
+
 export function dateSearch<T>(
   array: T[],
   target: T,
-  comparator: Comparator<T> | string = defaultTimeComparator
-): T | null {
+  comparator: Comparator<T> | null | string = defaultTimeComparator,
+  dateSearchMode = DATE_SEARCH_MODES.EXACT
+): DateSearchResult<T> {
+  const comparisonFn = (mid: number) => {
+    console.log(mid)
+    if (typeof comparator === "string") {
+      const keyPointer = comparator;
+      return deepTimeComparator(
+        target,
+        array[mid],
+        keyPointer,
+        defaultTimeComparator
+      );
+    }
+    return !!comparator
+      ? comparator(target, array[mid])
+      : defaultTimeComparator(target, array[mid]);
+  };
+
   let left = 0;
   let right = array.length - 1;
   while (left <= right) {
     const mid = Math.floor((left + right) / 2);
-    const comparison =
-      typeof comparator === "string"
-        ? deepTimeComparator(
-            target,
-            array[mid],
-            comparator,
-            defaultTimeComparator
-          )
-        : comparator(target, array[mid]);
-
+    const comparison = comparisonFn(mid);
     if (comparison === 0) {
-      return array[mid];
+      return {
+        index: mid,
+        value: array[mid],
+      };
     } else if (comparison < 0) {
       right = mid - 1;
     } else {
@@ -81,7 +103,31 @@ export function dateSearch<T>(
     }
   }
 
-  return null;
+  switch (dateSearchMode) {
+    case DATE_SEARCH_MODES.EXACT:
+      return {
+        index: null,
+        value: null,
+      };
+    case DATE_SEARCH_MODES.CLOSEST_FLOOR:
+      return {
+        index: left,
+        value: array[left],
+      };
+    case DATE_SEARCH_MODES.CLOSEST_CEIL:
+      const next = left + 1;
+      const last = array.length - 1;
+      const ceil = next <= array.length - 1 ? next : last;
+      return {
+        index: ceil,
+        value: array[ceil],
+      };
+    default:
+      return {
+        index: null,
+        value: null,
+      };
+  }
 }
 
 export default dateSearch;

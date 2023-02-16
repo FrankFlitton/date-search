@@ -6,6 +6,9 @@ import {
   parseToValidNumber,
   isDateType,
   DATE_TYPES,
+  Comparator,
+  DateSearchResult,
+  DATE_SEARCH_MODES,
 } from "./dateSearch";
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
@@ -21,6 +24,9 @@ export {
   parseToValidNumber,
   isDateType,
   DATE_TYPES,
+  DATE_SEARCH_MODES,
 };
+
+export type { Comparator, DateSearchResult };
 
 setupCounter(document.querySelector<HTMLButtonElement>("#counter")!);

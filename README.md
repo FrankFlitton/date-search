@@ -25,3 +25,4 @@ result === targetDate // true
   -  OR a custom comparison function.
 - Date, timestamp string, and unix epocs excepted.
 - Built with DayJS for MomentJS regression.
+- Find exact or closest entry
