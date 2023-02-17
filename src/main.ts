@@ -8,14 +8,8 @@ import {
   Comparator,
   DateSearchResult,
   DateSearchModes,
+  DateSearchTargets,
 } from "./dateSearch";
-
-// document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
-//   <div class="card">
-//   <button id="counter" type="button"></button>
-//   </div>
-//   `;
-// setupCounter(document.querySelector<HTMLButtonElement>("#counter")!);
 
 export {
   dateSearch,
@@ -27,4 +21,4 @@ export {
   DateSearchModes,
 };
 
-export type { Comparator, DateSearchResult };
+export type { Comparator, DateSearchResult, DateSearchTargets };

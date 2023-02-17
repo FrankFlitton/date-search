@@ -3,17 +3,22 @@ import get from "lodash.get";
 import isEmpty from "lodash.isempty";
 
 /**
- * Compares the two values numerically
- */
-export type Comparator<T> = (a: T, b: T) => number;
-
-/**
  * Search result format returned by the search.
  */
 export type DateSearchResult<T> = {
   index: number | null;
   value: T | null;
 };
+
+/**
+ * Valid date inputs to provide to the `target` parameter. If the value is falsy an error will be thrown.
+ */
+export type DateSearchTargets = string | number | Date | dayjs.Dayjs | null;
+
+/**
+ * Compares the two values numerically
+ */
+export type Comparator<T> = (targetVal: DateSearchTargets, searchVal: T) => number;
 
 /**
  * JS primitives that can describe a date. DayJS is used to parse them to Date objects.
@@ -67,14 +72,17 @@ export const parseToValidNumber = <T>(x: T) => {
  * @param b Date
  * @returns number
  */
-export function defaultTimeComparator<T>(a: T, b: T) {
-  if (isDateType(a) && isDateType(b)) {
+export function defaultTimeComparator<T>(
+  targetVal: DateSearchTargets,
+  searchVal: T
+) {
+  if (isDateType(targetVal) && isDateType(searchVal)) {
     return (
-      dayjs.default(a as dayjs.Dayjs).unix() -
-      dayjs.default(b as dayjs.Dayjs).unix()
+      dayjs.default(targetVal as dayjs.Dayjs).unix() -
+      dayjs.default(searchVal as dayjs.Dayjs).unix()
     );
   }
-  return parseToValidNumber(a) - parseToValidNumber(b);
+  return parseToValidNumber(targetVal) - parseToValidNumber(searchVal);
 }
 
 /**
@@ -87,14 +95,13 @@ export function defaultTimeComparator<T>(a: T, b: T) {
  * @returns number
  */
 export function deepTimeComparator<T>(
-  target: T,
+  target: DateSearchTargets,
   search: T,
   stringPath = "value",
   comparator: Comparator<T> = defaultTimeComparator
 ) {
-  const targetVal = get(target, stringPath);
   const searchVal = get(search, stringPath);
-  return comparator(targetVal, searchVal);
+  return comparator(target, searchVal);
 }
 
 /**
@@ -120,12 +127,14 @@ export enum DateSearchModes {
  */
 export function dateSearch<T>(
   array: T[],
-  target: T,
+  target: DateSearchTargets,
   comparator: Comparator<T> | null | string = defaultTimeComparator,
   dateSearchMode: DateSearchModes = DateSearchModes.EXACT
 ): DateSearchResult<T> {
+
+  if (!target) throw Error('No valid date target value provided.')
+
   const comparisonFn = (mid: number) => {
-    console.log(mid);
     if (typeof comparator === "string") {
       const keyPointer = comparator;
       return deepTimeComparator(

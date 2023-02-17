@@ -1,8 +1,9 @@
 import * as dayjs from "dayjs";
 import { dateSearch, DateSearchResult } from "./dateSearch";
-import { generateDateData } from "./generateData";
+import { generateDateData, generateNestedDateData } from "./generateData";
 
 const bigDatesArray = generateDateData();
+const bigNestedArray = generateNestedDateData();
 
 const validDate: DateSearchResult<dayjs.Dayjs> = {
   index: 0,
@@ -51,5 +52,15 @@ describe("search with flat array", () => {
   it("should not find, return null results", () => {
     const result = dateSearch(bigDatesArray, invalidDate);
     expect(result).toStrictEqual(invalidDateResult);
+  });
+});
+
+describe("search with nested data", () => {
+  it("should find with selector", () => {
+    const result = dateSearch(bigNestedArray, bigNestedArray[0].child.date, 'child.date');
+    expect(result).toStrictEqual({
+      index: 0,
+      value: bigNestedArray[0]
+    });
   });
 });

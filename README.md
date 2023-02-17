@@ -5,6 +5,10 @@ Search through your time series data with javascript. Find a value or its closes
 
 For advanced use cases, you can provide a custom comparison function for non-standard formats.
 
+## Documentation
+
+For detailed documentation: [https://date-search.netlify.app](https://date-search.netlify.app)
+
 ## Installation
 
 ```js
@@ -18,10 +22,10 @@ import { dateSearch } from 'date-search'; // or use require
 
 const bigSortedDatesArray = [Date('2000-1-1'), Date(), Date(), ...];
 
-const targetDate = Date('2000-1-1')
-const {index, value} =  dateSearch(bigSortedDatesArray, targetDate)
+const targetDate = '2000-1-1';
+const {index, value} =  dateSearch(bigSortedDatesArray, targetDate);
 
-targetDate === value; //true
+targetDate === value; // true
 index; // 0
 ```
 
@@ -35,10 +39,6 @@ index; // 0
 - Fuzzy search: find the exact or closest item.
 - Written in typescript with type documentation.
 
-## Documentation
-
-For detailed documentation: [https://date-search.netlify.app](https://date-search.netlify.app)
-
 ## Advanced Usage
 
 The search algo accepts these parameters:
@@ -49,7 +49,7 @@ A typed array of dates or nested objects containing dates. These should be sorte
 
 ### target
 
-The value the algo is searching for. This should be the same type as `array`.
+The value the algo is searching for. This should be the date that is being searched for. Valid inputs include `string`, `number`, `Date`, and `Dayjs` objects. `null` can be supplied but the module will throw an error.
 
 ### comparator (optional)
 
@@ -105,7 +105,7 @@ dateSearch(
   target: '1995-3-1',
   comparator: defaultTimeComparator,
   dateSearchMode: DateSearchModes.CLOSEST_FLOOR
-) // returns index of 2020-2-1
+) // returns index 1, value of 2020-2-1
 ```
 
 #### CLOSEST_CEIL
@@ -118,5 +118,5 @@ dateSearch(
   target: '1995-3-1',
   comparator: defaultTimeComparator,
   dateSearchMode: DateSearchModes.CLOSEST_FLOOR
-) // returns index of 2020-2-1
+) // returns index 2, value of 2020-2-1
 ```
