@@ -120,6 +120,6 @@ dateSearch(
   array: ['2020-1-1', '2020-2-1', '2020-5-1', ...],
   target: '1995-3-1',
   comparator: defaultTimeComparator,
-  dateSearchMode: DateSearchModes.CLOSEST_FLOOR
+  dateSearchMode: DateSearchModes.CLOSEST_CEIL
 ) // returns index 2, value of 2020-2-1
 ```
