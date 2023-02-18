@@ -21,4 +21,6 @@ export {
   DateSearchModes,
 };
 
+export default dateSearch;
+
 export type { Comparator, DateSearchResult, DateSearchTargets };

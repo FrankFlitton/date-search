@@ -1,7 +1,7 @@
 {
   "name": "date-search",
   "private": false,
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Universal time series search",
   "type": "module",
   "license": "MIT",
@@ -30,10 +30,10 @@
   "exports": {
     ".": {
       "import": "./dist/main.js",
-      "require": "./dist/main.cjs"
+      "require": "./dist/main.umd.cjs"
     }
   },
-  "main": "./dist/main.js",
+  "main": "./dist/main.umd.cjs",
   "module": "./dist/main.js",
   "typings": "./dist/main.d.ts",
   "files": [
