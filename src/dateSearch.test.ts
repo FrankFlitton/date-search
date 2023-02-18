@@ -1,6 +1,6 @@
 import * as dayjs from "dayjs";
 import { dateSearch, DateSearchResult } from "./dateSearch";
-import { generateDateData, generateNestedDateData } from "./generateData";
+import { generateDateData, generateNestedDateData } from "./generateData.mock";
 
 const bigDatesArray = generateDateData();
 const bigNestedArray = generateNestedDateData();
