@@ -41,6 +41,7 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, "src/main.ts"),
       fileName: "main",
+      name: "main",
       formats: ["es", "cjs"],
     },
     rollupOptions: {
@@ -50,10 +51,10 @@ export default defineConfig({
           preserveExtensions: true,
         }),
         typescript({
-          sourceMap: false,
+          sourceMap: true,
           declaration: true,
           outDir: "dist",
-          exclude: ["**/__tests__"],
+          exclude: ["**/**.test.**"],
         }),
         visualizer({
           title: "visualizer - vite-vanilla-ts-module",
