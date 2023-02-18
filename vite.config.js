@@ -54,7 +54,7 @@ export default defineConfig({
           sourceMap: true,
           declaration: true,
           outDir: "dist",
-          exclude: ["**/**.test.**"],
+          exclude: ["**/**.test.**", "**/**.mock.**"],
         }),
         visualizer({
           title: "visualizer - vite-vanilla-ts-module",
