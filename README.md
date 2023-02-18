@@ -1,8 +1,11 @@
 # date-search
 > Universal time series search
 
-[![npm](https://img.shields.io/npm/v/date-search?color=red)
-![npm](https://img.shields.io/npm/dw/date-search)](https://www.npmjs.com/package/date-search)
+[
+  ![npm](https://img.shields.io/npm/v/date-search?color=red)
+  ![npm](https://img.shields.io/npm/dw/date-search)
+  ![npm bundle size gzip](https://img.shields.io/bundlephobia/minzip/date-search?label=gzip)
+](https://www.npmjs.com/package/date-search)
 
 Search through your time series data with javascript. Find a value or its closest match through a list of dates or data frames. Dates can be represented as date string or number format that dateJS can parse.
 
