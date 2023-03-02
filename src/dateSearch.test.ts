@@ -57,10 +57,25 @@ describe("search with flat array", () => {
 
 describe("search with nested data", () => {
   it("should find with selector", () => {
-    const result = dateSearch(bigNestedArray, bigNestedArray[0].child.date, 'child.date');
+    const result = dateSearch(
+      bigNestedArray,
+      bigNestedArray[0].child.date,
+      "child.date"
+    );
     expect(result).toStrictEqual({
       index: 0,
-      value: bigNestedArray[0]
+      value: bigNestedArray[0],
+    });
+  });
+  it("should not find with selector", () => {
+    const result = dateSearch(
+      bigNestedArray,
+      dayjs.default(bigNestedArray[0].child.date).add(-1, "day"),
+      "child.date"
+    );
+    expect(result).toStrictEqual({
+      index: null,
+      value: null,
     });
   });
 });
