@@ -1,5 +1,10 @@
 import * as dayjs from "dayjs";
-import { dateSearch, DateSearchModes, DateSearchResult, DateSearchTargets } from "./dateSearch";
+import {
+  dateSearch,
+  DateSearchModes,
+  DateSearchResult,
+  DateSearchTargets,
+} from "./dateSearch";
 import { generateDateData, generateNestedDateData } from "./generateData.mock";
 
 const bigDatesArray = generateDateData();
@@ -91,14 +96,16 @@ describe("search with nested data", () => {
   });
 });
 
-const customFormatArray = bigDatesArray.map((d) => d.format("MM/DD/YYYY"));
+const customFormatArray = bigDatesArray.map((d) =>
+  d.format("MM/DD/YYYY HH:mm")
+);
 
 const targetValNumber = parseInt(
   bigDatesArray[5].format("YYYY-DD-MM").split("-").join("")
 );
 
 const targetValNumberTimeOffset = parseInt(
-  bigDatesArray[5].add(1, 'hour').format("YYYY-DD-MM").split("-").join("")
+  bigDatesArray[5].add(1, "hour").format("YYYY-DD-MM-HH-mm").split("-").join("")
 );
 
 const validDateCustom = {
@@ -106,45 +113,65 @@ const validDateCustom = {
   value: customFormatArray[5],
 };
 
+const validDateCustomCeil = {
+  index: 6,
+  value: customFormatArray[6],
+};
+
 const customCompare = (targetVal: DateSearchTargets, searchVal: string) => {
   const tString = `${targetVal}`;
+  const tY = tString.substring(0, 4);
   const tD = tString.substring(4, 6);
   const tM = tString.substring(6, 8);
-  const tY = tString.substring(0, 4);
-  const t = dayjs.default(`${tY}-${tM}-${tD} 00:00`).unix();
+  const tH = tString.substring(8, 10) || "00";
+  const tMin = tString.substring(8, 12) || "00";
+  const tIsoString = `${tY}-${tM}-${tD} ${tH}:${tMin}`;
+  const t = dayjs.default(tIsoString).unix();
 
-  const sArray = searchVal.split("/");
-  const s = dayjs
-    .default(`${sArray[2]}-${sArray[0]}-${sArray[1]} 00:00`)
-    .unix();
-
-  console.log(
-    `${tString}, ${tY}-${tM}-${tD}`,
-    `${sArray[2]}-${sArray[0]}-${sArray[1]}`
-  );
+  const sSplit = searchVal.split(" ");
+  const sTArray = sSplit[1] ? sSplit[1].split(":") : ["00", "00"];
+  const sDArray = sSplit[0].split("/");
+  const sIsoString = `${sDArray[2]}-${sDArray[0]}-${sDArray[1]} ${sTArray[0]}:${sTArray[1]}`;
+  const s = dayjs.default(sIsoString).unix();
 
   return t - s;
 };
 
-describe("advanced searches", () => {
-  it("custom comparator", () => {
+describe("custom comparator", () => {
+  it("should find the element", () => {
     const result = dateSearch(
       customFormatArray,
       targetValNumber,
-      customCompare,
-      DateSearchModes.CLOSEST_FLOOR,
+      customCompare
     );
 
     expect(result).toStrictEqual(validDateCustom);
   });
-  it("custom comparator, round down", () => {
+  it("should round down to the closest result", () => {
     const result = dateSearch(
       customFormatArray,
       targetValNumberTimeOffset,
       customCompare,
-      DateSearchModes.CLOSEST_FLOOR,
+      DateSearchModes.CLOSEST_FLOOR
     );
-
     expect(result).toStrictEqual(validDateCustom);
+  });
+  it("should round up to the closest result", () => {
+    const result = dateSearch(
+      customFormatArray,
+      targetValNumberTimeOffset,
+      customCompare,
+      DateSearchModes.CLOSEST_CEIL
+    );
+    expect(result).toStrictEqual(validDateCustomCeil);
+  });
+  it("should not find element", () => {
+    const invalidCustomDate  = bigDatesArray[0].add(-1, 'days').format("YYYY-DD-MM").split("-").join("")
+    const result = dateSearch(
+      customFormatArray,
+      invalidCustomDate,
+      customCompare
+    );
+    expect(result).toStrictEqual(invalidDateResult);
   });
 });
