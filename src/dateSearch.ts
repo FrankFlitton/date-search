@@ -3,22 +3,41 @@ import get from "lodash.get";
 import isEmpty from "lodash.isempty";
 
 /**
- * Search result format returned by the search.
+ * Search result format returned by the search including the array index and the matching value.
  */
 export type DateSearchResult<T> = {
-  index: number | null;
-  value: T | null;
+  index?: number;
+  value?: T;
+};
+
+/**
+ * Search result between two target dates.
+ * An array of the matching items are returned inclusive of the first and last results.
+ */
+export type DateSearchBetweenResult<T> = {
+  startValue?: DateSearchResult<T>;
+  endValue?: DateSearchResult<T>;
+  array: T[];
 };
 
 /**
  * Valid date inputs to provide to the `target` parameter. If the value is falsy an error will be thrown.
  */
-export type DateSearchTargets = string | number | Date | dayjs.Dayjs | null;
+export type DateSearchTargets =
+  | string
+  | number
+  | Date
+  | dayjs.Dayjs
+  | null
+  | undefined;
 
 /**
  * Compares the two values numerically
  */
-export type Comparator<T> = (targetVal: DateSearchTargets, searchVal: T) => number;
+export type Comparator<T> = (
+  targetVal: DateSearchTargets,
+  searchVal: T
+) => number;
 
 /**
  * JS primitives that can describe a date. DayJS is used to parse them to Date objects.
@@ -131,8 +150,7 @@ export function dateSearch<T>(
   comparator: Comparator<T> | null | string = defaultTimeComparator,
   dateSearchMode: DateSearchModes = DateSearchModes.EXACT
 ): DateSearchResult<T> {
-
-  if (!target) throw Error('No valid date target value provided.')
+  if (!target) throw Error("No valid date target value provided.");
 
   const comparisonFn = (mid: number) => {
     if (typeof comparator === "string") {
@@ -171,11 +189,14 @@ export function dateSearch<T>(
   switch (dateSearchMode) {
     case DateSearchModes.EXACT:
       return {
-        index: null,
-        value: null,
+        index: undefined,
+        value: undefined,
       };
     case DateSearchModes.CLOSEST_FLOOR:
-      const floor = Math.max(0, fallbackIndex);
+      let floor = 0;
+      if (comparisonFn(0) >= 0)
+        // target is smaller than first value
+        floor = Math.max(0, fallbackIndex);
       return {
         index: floor,
         value: array[floor],
@@ -189,10 +210,63 @@ export function dateSearch<T>(
       };
     default:
       return {
-        index: null,
-        value: null,
+        index: undefined,
+        value: undefined,
       };
   }
+}
+
+/**
+ * Binary Search for dates or time series data.
+ *
+ * @param array Sorted array containing date/time values
+ * @param target date/time value
+ * @param comparator string pointing to a nested key or comparator function
+ * @param dateSearchMode Exact or fuzzy search
+ * @returns
+ */
+export function dateSearchBetween<T>(
+  array: T[],
+  startDate: DateSearchTargets,
+  endDate: DateSearchTargets,
+  comparator: Comparator<T> | null | string = defaultTimeComparator
+): DateSearchBetweenResult<T> {
+  if (!startDate) throw Error("No valid date target value provided.");
+  if (!endDate) throw Error("No valid date target value provided.");
+
+  if (!array) {
+    return {
+      startValue: undefined,
+      endValue: undefined,
+      array: [],
+    };
+  }
+
+  const startValue = dateSearch(
+    array,
+    startDate,
+    comparator,
+    DateSearchModes.CLOSEST_FLOOR
+  );
+  const endValue = dateSearch(
+    array,
+    endDate,
+    comparator,
+    DateSearchModes.CLOSEST_CEIL
+  );
+
+  const results = array.slice(
+    startValue.index && startValue.index > 0 ? startValue.index : 0,
+    endValue.index && endValue.index < array.length
+      ? endValue.index
+      : array.length - 1
+  );
+
+  return {
+    startValue,
+    endValue,
+    array: results,
+  };
 }
 
 export default dateSearch;

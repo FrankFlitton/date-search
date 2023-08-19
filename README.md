@@ -1,10 +1,11 @@
 # date-search
+
 > Universal time series search
 
 [
-  ![npm](https://img.shields.io/npm/v/date-search?color=red)
-  ![npm](https://img.shields.io/npm/dw/date-search)
-  ![npm bundle size gzip](https://img.shields.io/bundlephobia/minzip/date-search?label=gzip)
+![npm](https://img.shields.io/npm/v/date-search?color=red)
+![npm](https://img.shields.io/npm/dw/date-search)
+![npm bundle size gzip](https://img.shields.io/bundlephobia/minzip/date-search?label=gzip)
 ](https://www.npmjs.com/package/date-search)
 
 Search through your time series data with javascript. Find a value or its closest match through a list of dates or data frames. Dates can be represented as date string or number format that dateJS can parse.
@@ -21,18 +22,41 @@ For detailed documentation: [https://date-search.netlify.app](https://date-searc
 npm i date-search
 ```
 
-## Simple Usage
+## Usage
+
+Use the `dateSearch` function to quickly find if your target date is present.
 
 ```js
 import { dateSearch } from 'date-search'; // or use require
 
-const bigSortedDatesArray = [Date('2000-1-1'), Date(), Date(), ...];
-
+const bigSortedDatesArray = [Date('2000-1-1'), Date('2000-1-2'), Date('2000-1-3')];
 const targetDate = '2000-1-1';
-const {index, value} =  dateSearch(bigSortedDatesArray, targetDate);
 
+const {index, value} =  dateSearch(
+  bigSortedDatesArray,
+  targetDate
+);
 targetDate === value; // true
 index; // 0
+
+```
+
+The `dateSearchBetween` will return the closest matching results inclusive of the target start and end search dates.
+
+```js
+import { dateSearchBetween } from 'date-search'; // or use require
+
+const bigSortedDatesArray = [Date('2000-1-1'), Date(), Date(), ...];
+
+const startDate = '2000-1-13';
+const endDate = '2000-1-23';
+
+const {startValue, endValue, array} =  dateSearchBetween(
+  bigSortedDatesArray,
+  targetDate
+);
+array.length; // 11
+
 ```
 
 ## Features
@@ -41,6 +65,7 @@ index; // 0
 - Custom comparators:
   - String referencing a value within an object or nested object.
   - Custom comparison function and date parsing.
+- Get segment of array that matches between two dates.
 - Built with DayJS for MomentJS regression and more reliable date parsing.
 - Fuzzy search: find the exact or closest item.
 - Written in typescript with type documentation.

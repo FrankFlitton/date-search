@@ -1,31 +1,41 @@
 import * as dayjs from "dayjs";
 import {
   dateSearch,
+  dateSearchBetween,
   DateSearchModes,
   DateSearchResult,
   DateSearchTargets,
+  defaultTimeComparator,
 } from "./dateSearch";
 import { generateDateData, generateNestedDateData } from "./generateData.mock";
 
+const smallDatesArray = generateDateData("2020-1-1", 101);
+const smallNestedArray = generateNestedDateData("2020-1-1", 101);
 const bigDatesArray = generateDateData();
 const bigNestedArray = generateNestedDateData();
 
 const invalidDate = dayjs.default(bigNestedArray[0].child.date).add(-1, "day");
 
 const invalidDateResult: DateSearchResult<dayjs.Dayjs> = {
-  index: null,
-  value: null,
+  index: undefined,
+  value: undefined,
 };
 
-const validFirstDate: DateSearchResult<dayjs.Dayjs> = {
+const validstartDate: DateSearchResult<dayjs.Dayjs> = {
   index: 0,
   value: bigDatesArray[0],
 };
 
+// const invalidDateBetweenResult: DateSearchBetweenResult<dayjs.Dayjs> = {
+//   startValue: undefined,
+//   endValue: undefined,
+//   array: [],
+// };
+
 describe("search with flat array", () => {
   it("should find first", () => {
-    const result = dateSearch(bigDatesArray, validFirstDate.value);
-    expect(result).toStrictEqual(validFirstDate);
+    const result = dateSearch(bigDatesArray, validstartDate.value);
+    expect(result).toStrictEqual(validstartDate);
   });
   it("should find, middle", () => {
     const validMiddleDate: DateSearchResult<dayjs.Dayjs> = {
@@ -63,17 +73,17 @@ describe("search with flat array", () => {
 describe("search with nested data", () => {
   it("should find with selector", () => {
     const result = dateSearch(
-      bigNestedArray,
-      bigNestedArray[0].child.date,
+      smallNestedArray,
+      smallNestedArray[0].child.date,
       "child.date"
     );
     expect(result).toStrictEqual({
       index: 0,
-      value: bigNestedArray[0],
+      value: smallNestedArray[0],
     });
   });
   it("should not find with selector", () => {
-    const result = dateSearch(bigNestedArray, invalidDate, "child.date");
+    const result = dateSearch(smallNestedArray, invalidDate, "child.date");
     expect(result).toStrictEqual(invalidDateResult);
   });
 });
@@ -156,6 +166,20 @@ describe("custom comparator", () => {
     );
     expect(result).toStrictEqual(validDateCustom);
   });
+  it("round down, out of bounds first result", () => {
+    const target = smallDatesArray[0].add(-1, "days");
+
+    const result = dateSearch(
+      smallDatesArray,
+      target,
+      defaultTimeComparator,
+      DateSearchModes.CLOSEST_FLOOR
+    );
+    expect(result).toStrictEqual({
+      index: 0,
+      value: smallDatesArray[0],
+    });
+  });
   it("should round up to the closest result", () => {
     const result = dateSearch(
       customFormatArray,
@@ -166,12 +190,75 @@ describe("custom comparator", () => {
     expect(result).toStrictEqual(validDateCustomCeil);
   });
   it("should not find element", () => {
-    const invalidCustomDate  = bigDatesArray[0].add(-1, 'days').format("YYYY-DD-MM").split("-").join("")
+    const invalidCustomDate = bigDatesArray[0]
+      .add(-1, "days")
+      .format("YYYY-DD-MM")
+      .split("-")
+      .join("");
     const result = dateSearch(
       customFormatArray,
       invalidCustomDate,
       customCompare
     );
     expect(result).toStrictEqual(invalidDateResult);
+  });
+});
+
+describe("between", () => {
+  it("first and last match", () => {
+    const firstIndex = 10;
+    const lastIndex = 80;
+    const startValue = smallDatesArray[firstIndex];
+    const endValue = smallDatesArray[lastIndex];
+
+    const expected = {
+      startValue: { index: firstIndex, value: startValue },
+      endValue: { index: lastIndex, value: endValue },
+      array: smallDatesArray.slice(firstIndex, lastIndex),
+    };
+
+    const result = dateSearchBetween(smallDatesArray, startValue, endValue);
+
+    expect(result).toStrictEqual(expected);
+  });
+  it("first matches and last is out of bounds", () => {
+    const firstIndex = 10;
+    const lastIndex = smallDatesArray.length - 1;
+    const startValue = smallDatesArray[firstIndex];
+    const endValue = smallDatesArray[lastIndex];
+
+    const errValue = endValue
+      .add(1, "days")
+      .format("YYYY-DD-MM")
+      .split("-")
+      .join("");
+
+    const expected = {
+      startValue: { index: firstIndex, value: startValue },
+      endValue: { index: lastIndex, value: endValue },
+      array: smallDatesArray.slice(firstIndex, lastIndex),
+    };
+
+    const result = dateSearchBetween(smallDatesArray, startValue, errValue);
+
+    expect(result).toStrictEqual(expected);
+  });
+  it("first is out of bounds and last matches", () => {
+    const firstIndex = 0;
+    const lastIndex = 4;
+    const startValue = smallDatesArray[firstIndex];
+    const endValue = smallDatesArray[lastIndex];
+
+    const errValue = smallDatesArray[firstIndex].add(-1, "days");
+
+    const expected = {
+      startValue: { index: firstIndex, value: startValue },
+      endValue: { index: lastIndex, value: endValue },
+      array: smallDatesArray.slice(firstIndex, lastIndex),
+    };
+
+    const result = dateSearchBetween(smallDatesArray, errValue, endValue);
+
+    expect(result).toStrictEqual(expected);
   });
 });
