@@ -1,5 +1,12 @@
 {
+  "$schema": "https://typedoc.org/schema.json",
   "entryPoints": ["src/main.ts"],
-  "out": "_docs",
-  "includeVersion": true
+  "out": "_docs/api",
+  "includeVersion": true,
+  "plugin": ["typedoc-plugin-markdown"],
+  "markedOptions": {
+    "entryDocument": "index.md"
+  }
+  // "namedAnchors": "true",
+  // "preserveAnchorCasing": "true"
 }

@@ -82,6 +82,7 @@ typings/
 .nuxt
 dist
 _docs
+.vitepress/cache**
 
 # Gatsby files
 .cache/

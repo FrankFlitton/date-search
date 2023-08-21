@@ -19,6 +19,9 @@ export default defineConfig({
       // incomplete: "",
     }),
   ],
+  output: {
+    exports: "named",
+  },
   resolve: {
     alias: [
       {
