@@ -38,7 +38,10 @@ const renameLinks = (dir) => {
         const r1 = content.replace(/\.\/\.\.\/README\.md/gm, "./../index.md");
         const r2 = r1.replace(/\.\/README\.md/gm, "./index.md");
         const r3 = r2.replace(/\.\/README/gm, "./index");
-        const r4 = r3.replace(/enums\/DateSearchModes\.md/gm, "dateSearchModes.md");
+        const r4 = r3.replace(
+          /enums\/DateSearchModes\.md/gm,
+          "dateSearchModes.md"
+        );
         const r5 = r4.replace(/\.\/README.html/gm, "/");
         fs.writeFileSync(filePath, r5, "utf-8");
       }

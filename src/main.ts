@@ -1,5 +1,6 @@
 import {
   dateSearch,
+  dateSearchBetween,
   deepTimeComparator,
   defaultTimeComparator,
   parseToValidNumber,
@@ -13,6 +14,7 @@ import {
 
 export {
   dateSearch,
+  dateSearchBetween,
   deepTimeComparator,
   defaultTimeComparator,
   parseToValidNumber,
